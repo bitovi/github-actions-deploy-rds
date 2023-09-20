@@ -91,7 +91,7 @@ runs:
   steps:
     - name: Deploy with BitOps
       id: deploy
-      uses: bitovi/github-actions-commons@make-rds-run-free
+      uses: bitovi/github-actions-commons@main
       with:
         # Current repo vars
         bitops_code_only: ${{ inputs.bitops_code_only }}
