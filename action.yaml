@@ -1,0 +1,127 @@
+name: 'Deploy Amazon RDS DB'
+description: 'Deploys an AWS RDS database.'
+branding:
+  icon: upload-cloud
+  color: red
+inputs:
+  bitops_code_only:
+    description: 'Will run only the generation phase of BitOps, where the Terraform and Ansible code is built.'
+    required: false
+  bitops_code_store:
+    description: 'Store BitOps code as a GitHub artifact'
+    required: false
+    default: false
+
+  # AWS
+  aws_access_key_id:
+    description: 'AWS access key ID'
+    required: true
+  aws_secret_access_key:
+    description: 'AWS secret access key'
+    required: true
+  aws_session_token:
+    description: 'AWS session token'
+    required: false
+  aws_default_region:
+    description: 'AWS default region'
+    required: false
+    default: us-east-1
+  aws_resource_identifier:
+    description: 'Set to override the AWS resource identifier for the deployment.  Defaults to `${org}-{repo}-{branch}`.  Use with destroy to destroy specific resources.'
+    required: false
+  aws_additional_tags:
+    description: 'A JSON object of additional tags that will be included on created resources. Example: `{"key1": "value1", "key2": "value2"}`'
+    required: false
+
+  # Terraform
+  tf_state_bucket:
+    description: 'AWS S3 bucket to use for Terraform state. Defaults to `${org}-${repo}-{branch}-tf-state`'
+    required: false
+  tf_stack_destroy:
+    description: 'Set to "true" to Destroy the stack through Terraform.'
+    required: false
+  tf_state_bucket_destroy:
+    description: 'Force purge and deletion of S3 bucket defined. Any file contained there will be destroyed. `stack_destroy` must also be `true`'
+    required: false
+  
+
+  # AWS RDS
+  aws_rds_db_enable:
+    description: 'Set to true to enable an RDS DB.'
+    required: false
+  aws_rds_db_name:
+    description: 'The name of the database to create when the DB instance is created.'
+    required: false
+  aws_rds_db_engine:
+    description: 'Which Database engine to use. Default is postgres'
+    required: false
+  aws_rds_db_engine_version:
+    description: 'Which Database engine version to use.'
+    required: false
+  aws_rds_db_security_group_name:
+    description: 'The name of the database security group. Defaults to SG for aws_resource_identifier - RDS.'
+    required: false
+  aws_rds_db_port:
+    description: ' Port where the DB listens to.'
+    required: false
+  aws_rds_db_subnets:
+    description: 'Specify which subnets to use as a list of strings. '
+    required: false
+  aws_rds_db_allocated_storage:
+    description: 'Storage size. Defaults to 10.'
+    required: false
+  aws_rds_db_max_allocated_storage:
+    description: 'Max storage size. Defaults to 0 to disable auto-scaling.'
+    required: false
+  aws_rds_db_instance_class:
+    description: 'DB instance server type. Defaults to db.t3.micro.'
+    required: false
+  aws_rds_db_user:
+    description: 'Username for the db. Defaults to dbuser.'
+    required: false
+  aws_rds_cloudwatch_logs_exports:
+    description: 'Set of log types to enable for exporting to CloudWatch logs.'
+    required: false
+  aws_rds_additional_tags:
+    description: 'A JSON object of additional tags that will be included on created resources. Example: `{"key1": "value1", "key2": "value2"}`'
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Deploy with BitOps
+      id: deploy
+      uses: bitovi/github-actions-commons@main
+      with:
+        # Current repo vars
+        bitops_code_only: ${{ inputs.bitops_code_only }}
+        bitops_code_store: ${{ inputs.bitops_code_store }}
+
+        # AWS
+        aws_access_key_id: ${{ inputs.aws_access_key_id }}
+        aws_secret_access_key: ${{ inputs.aws_secret_access_key }}
+        aws_session_token: ${{ inputs.aws_session_token }}
+        aws_default_region: ${{ inputs.aws_default_region }}
+        aws_resource_identifier: ${{ inputs.aws_resource_identifier }}
+        aws_additional_tags: ${{ inputs.aws_additional_tags }}
+
+        # Terraform
+        tf_state_bucket: ${{ inputs.tf_state_bucket }}
+        tf_stack_destroy: ${{ inputs.tf_stack_destroy }}
+        tf_state_bucket_destroy: ${{ inputs.tf_state_bucket_destroy }}
+        tf_state_bucket_provider: 'aws'
+
+        # AWS RDS
+        aws_rds_db_enable: ${{ inputs.aws_rds_db_enable }}
+        aws_rds_db_name: ${{ inputs.aws_rds_db_name }}
+        aws_rds_db_engine: ${{ inputs.aws_rds_db_engine }}
+        aws_rds_db_engine_version: ${{ inputs.aws_rds_db_engine_version }}
+        aws_rds_db_security_group_name: ${{ inputs.aws_rds_db_security_group_name }}
+        aws_rds_db_port: ${{ inputs.aws_rds_db_port }}
+        aws_rds_db_subnets: ${{ inputs.aws_rds_db_subnets }}
+        aws_rds_db_allocated_storage: ${{ inputs.aws_rds_db_allocated_storage }}
+        aws_rds_db_max_allocated_storage: ${{ inputs.aws_rds_db_max_allocated_storage }}
+        aws_rds_db_instance_class: ${{ inputs.aws_rds_db_instance_class }}
+        aws_rds_db_user: ${{ inputs.aws_rds_db_user }}
+        aws_rds_cloudwatch_logs_exports: ${{ inputs.aws_rds_cloudwatch_logs_exports }}
+        aws_rds_additional_tags: ${{ inputs.aws_rds_additional_tags }}
