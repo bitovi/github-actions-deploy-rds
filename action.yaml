@@ -126,7 +126,7 @@ runs:
   steps:
     - name: Deploy with BitOps
       id: deploy
-      uses: bitovi/github-actions-commons@print-better-results-rds-ecs
+      uses: bitovi/github-actions-commons@rds-db-improvements
       with:
         # AWS
         aws_access_key_id: ${{ inputs.aws_access_key_id }}
