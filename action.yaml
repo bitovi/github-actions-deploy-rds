@@ -128,10 +128,6 @@ runs:
       id: deploy
       uses: bitovi/github-actions-commons@print-better-results-rds-ecs
       with:
-        # Current repo vars
-        bitops_code_only: ${{ inputs.bitops_code_only }}
-        bitops_code_store: ${{ inputs.bitops_code_store }}
-
         # AWS
         aws_access_key_id: ${{ inputs.aws_access_key_id }}
         aws_secret_access_key: ${{ inputs.aws_secret_access_key }}
@@ -139,28 +135,50 @@ runs:
         aws_default_region: ${{ inputs.aws_default_region }}
         aws_resource_identifier: ${{ inputs.aws_resource_identifier }}
         aws_additional_tags: ${{ inputs.aws_additional_tags }}
-
         # Terraform
         tf_stack_destroy: ${{ inputs.tf_stack_destroy }}
         tf_state_file_name: ${{ inputs.tf_state_file_name }}
         tf_state_file_name_append: ${{ inputs.tf_state_file_name_append }}
         tf_state_bucket: ${{ inputs.tf_state_bucket }}
         tf_state_bucket_destroy: ${{ inputs.tf_state_bucket_destroy }}
+        # Current repo vars
+        bitops_code_only: ${{ inputs.bitops_code_only }}
+        bitops_code_store: ${{ inputs.bitops_code_store }}
+
+
 
         # AWS RDS
         aws_rds_db_enable: ${{ inputs.aws_rds_db_enable }}
+        aws_rds_db_proxy: ${{ inputs.aws_rds_db_proxy }}
         aws_rds_db_name: ${{ inputs.aws_rds_db_name }}
+        aws_rds_db_user: ${{ inputs.aws_rds_db_user }}
         aws_rds_db_engine: ${{ inputs.aws_rds_db_engine }}
         aws_rds_db_engine_version: ${{ inputs.aws_rds_db_engine_version }}
         aws_rds_db_security_group_name: ${{ inputs.aws_rds_db_security_group_name }}
+        aws_rds_db_allowed_security_groups: ${{ inputs.aws_rds_db_allowed_security_groups }}
+        aws_rds_db_ingress_allow_all: ${{ inputs.aws_rds_db_ingress_allow_all }}
+        aws_rds_db_publicly_accessible: ${{ inputs.aws_rds_db_publicly_accessible }}
         aws_rds_db_port: ${{ inputs.aws_rds_db_port }}
         aws_rds_db_subnets: ${{ inputs.aws_rds_db_subnets }}
         aws_rds_db_allocated_storage: ${{ inputs.aws_rds_db_allocated_storage }}
         aws_rds_db_max_allocated_storage: ${{ inputs.aws_rds_db_max_allocated_storage }}
         aws_rds_db_instance_class: ${{ inputs.aws_rds_db_instance_class }}
-        aws_rds_db_user: ${{ inputs.aws_rds_db_user }}
-        aws_rds_cloudwatch_logs_exports: ${{ inputs.aws_rds_cloudwatch_logs_exports }}
-        aws_rds_additional_tags: ${{ inputs.aws_rds_additional_tags }}
+        aws_rds_db_final_snapshot: ${{ inputs.aws_rds_db_final_snapshot }}
+        aws_rds_db_restore_snapshot_identifier: ${{ inputs.aws_rds_db_restore_snapshot_identifier }}
+        aws_rds_db_cloudwatch_logs_exports: ${{ inputs.aws_rds_db_cloudwatch_logs_exports }}
+        aws_rds_db_additional_tags: ${{ inputs.aws_rds_db_additional_tags }}
+
+        # DB Proxy
+        aws_db_proxy_name : ${{ inputs.aws_db_proxy_name }}
+        aws_db_proxy_client_password_auth_type : ${{ inputs.aws_db_proxy_client_password_auth_type }}
+        aws_db_proxy_tls : ${{ inputs.aws_db_proxy_tls }}
+        aws_db_proxy_security_group_name : ${{ inputs.aws_db_proxy_security_group_name }}
+        aws_db_proxy_database_security_group_allow : ${{ inputs.aws_db_proxy_database_security_group_allow }}
+        aws_db_proxy_allowed_security_group : ${{ inputs.aws_db_proxy_allowed_security_group }}
+        aws_db_proxy_allow_all_incoming : ${{ inputs.aws_db_proxy_allow_all_incoming }}
+        aws_db_proxy_cloudwatch_enable : ${{ inputs.aws_db_proxy_cloudwatch_enable }}
+        aws_db_proxy_cloudwatch_retention_days : ${{ inputs.aws_db_proxy_cloudwatch_retention_days }}
+        aws_db_proxy_additional_tags: ${{ inputs.aws_db_proxy_additional_tags }}
 
         # AWS VPC Inputs
         aws_vpc_create: ${{inputs.aws_vpc_create }}
