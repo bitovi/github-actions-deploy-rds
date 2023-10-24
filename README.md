@@ -115,12 +115,12 @@ The following inputs can be used as `step.with` keys
 |------------------|---------|------------------------------------|
 | `aws_db_proxy_name` | String | Name of the database proxy.  Defaults to `aws_resource_identifier` |
 | `aws_db_proxy_client_password_auth_type` | String | Overrides auth type. Using `MYSQL_NATIVE_PASSWORD`, `POSTGRES_SCRAM_SHA_256`, and `SQL_SERVER_AUTHENTICATION` depending on the database family. |
-| `aws_db_proxy_tls` | String | Make TLS a requirement for connections. Defaults to `true`.|
+| `aws_db_proxy_tls` | Boolean | Make TLS a requirement for connections. Defaults to `true`.|
 | `aws_db_proxy_security_group_name` | String | Name for the proxy security group. Defaults to `aws_resource_identifier`. |
-| `aws_db_proxy_database_security_group_allow` | String | If true, will add an incoming rule from every security group associated with the DB. |
+| `aws_db_proxy_database_security_group_allow` | Boolean | If true, will add an incoming rule from every security group associated with the DB. |
 | `aws_db_proxy_allowed_security_group` | String | Comma separated list fo allowed security groups to add.|
-| `aws_db_proxy_allow_all_incoming` | String | Allow all incoming traffic to the DB Proxy. Mind that the proxy is only available from the internal network except manually exposed. | 
-| `aws_db_proxy_cloudwatch_enable` | String | Toggle Cloudwatch logs. Will be stored in `/aws/rds/proxy/rds_proxy.name`. |
+| `aws_db_proxy_allow_all_incoming` | Boolean | Allow all incoming traffic to the DB Proxy. Mind that the proxy is only available from the internal network except manually exposed. | 
+| `aws_db_proxy_cloudwatch_enable` | Boolean | Toggle Cloudwatch logs. Will be stored in `/aws/rds/proxy/rds_proxy.name`. |
 | `aws_db_proxy_cloudwatch_retention_days` | String | Number of days to retain cloudwatch logs. Defaults to `14`. |
 | `aws_db_proxy_additional_tags` | JSON | Add additional tags to the ter added to aurora provisioned resources.|
 <hr/>
