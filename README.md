@@ -20,12 +20,9 @@ You can **get help or ask questions** on our:
 
 - [Discord Community](https://discord.gg/J7ejFsZnJ4Z)
 
-
 Or, you can hire us for training, consulting, or development. [Set up a free consultation](https://www.bitovi.com/services/devops-consulting).
 
 # Basic Use
-
-> **Note: ** Be sure to [set up your project for actions deployed pages](#set-up-your-project-for-actions-deployed-pages).
 
 For basic usage, create `.github/workflows/deploy.yaml` with the following to build on push.
 ```yaml
@@ -44,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - id: build-publish
-      uses: bitovi/github-actions-deploy-rds@v1.0.0
+      uses: bitovi/github-actions-deploy-rds@v0.1.0
       with:
         aws_rds_db_enable: true
 ```
@@ -141,58 +138,12 @@ The following inputs can be used as `step.with` keys
 <hr/>
 <br/>
 
-# Customizing
-
-## Repository Environments
-To surface published url to the root of the repo via a GitHub Environment, add the following to your workflow:
-```yaml
-# ...etc
-jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.build-publish.outputs.page_url }}
-    # ...etc
-```
-
-> *Note:* This is helpful when you have a custom domain
-
-<details>
-  <summary>Full example with environment</summary>
-
-  ```yaml
-  on:
-    push:
-      branches:
-        - "main" # change to the branch you wish to deploy from
-
-  permissions:
-    contents: read
-    pages: write
-    id-token: write
-
-  jobs:
-    deploy:
-      environment:
-        name: github-pages
-        url: ${{ steps.build-publish.outputs.page_url }}
-      runs-on: ubuntu-latest
-      steps:
-      - id: build-publish
-        uses: bitovi/github-actions-storybook-to-github-pages@v1.2.0
-        with:
-          path: build # change to your build folder
-  ```
-</details>
-
-## External Blog Posts
-- [How to Deploy Storybook to GitHub Pages with GitHub Actions](https://www.bitovi.com/blog/deploy-storybook-to-github-pages-with-github-actions)
 
 ## Contributing
-We would love for you to contribute to [`bitovi/github-actions-storybook-to-github-pages`](hhttps://github.com/bitovi/github-actions-storybook-to-github-pages).   [Issues](https://github.com/bitovi/github-actions-storybook-to-github-pages/issues) and [Pull Requests](https://github.com/bitovi/github-actions-storybook-to-github-pages/pulls) are welcome!
+We would love for you to contribute to [`bitovi/github-actions-deploy-rds`](hhttps://github.com/bitovi/github-actions-deploy-rds).   [Issues](https://github.com/bitovi/github-actions-deploy-rds/issues) and [Pull Requests](https://github.com/bitovi/github-actions-deploy-rds/pulls) are welcome!
 
 ## License
-The scripts and documentation in this project are released under the [MIT License](https://github.com/bitovi/github-actions-storybook-to-github-pages/blob/main/LICENSE).
+The scripts and documentation in this project are released under the [MIT License](https://github.com/bitovi/github-actions-deploy-rds/blob/main/LICENSE).
 
 # Provided by Bitovi
 [Bitovi](https://www.bitovi.com/) is a proud supporter of Open Source software.
