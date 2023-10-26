@@ -31,11 +31,6 @@ on:
     branches:
       - "main" # change to the branch you wish to deploy from
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -43,6 +38,10 @@ jobs:
     - id: build-publish
       uses: bitovi/github-actions-deploy-rds@v0.1.0
       with:
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws_default_region: us-east-1
+
         aws_rds_db_enable: true
 ```
 ### Inputs
