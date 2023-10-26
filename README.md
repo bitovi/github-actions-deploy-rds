@@ -1,29 +1,201 @@
-# github-action-deploy-rds
-Deploys an AWS RDS Database instance
+# Deploy AWS RDS Database 
+
+`/github-actions-deploy-rds` builds and deploys an AWS RDS Database, with the option for a proxy.
+
+This action uses our new GitHub Actions Commons repository, a library that contains multiple Terraform modules, allowing us to condense all of our tools in one repo, hence continuous improvements are made to it. 
+
+## You are here
+This action creates an RDS Database, with the option to add even a proxy.
+
+If you would like to deploy a backend app/service, check out our other actions:
+| Action | Purpose |
+| ------ | ------- |
+| [Deploy Docker to EC2](https://github.com/bitovi/github-actions-deploy-docker-to-ec2) | Deploys a repo with a Dockerized application to a virtual machine (EC2) on AWS |
+| [Deploy static site to AWS (S3/CDN/R53)](https://github.com/marketplace/actions/deploy-static-site-to-aws-s3-cdn-r53) | Hosts a static site in AWS S3 with CloudFront |
+
+# Need help or have questions?
+This project is supported by [Bitovi, A DevOps consultancy](https://www.bitovi.com/services/devops-consulting).
+
+You can **get help or ask questions** on our:
+
+- [Discord Community](https://discord.gg/J7ejFsZnJ4Z)
 
 
-#### **ECR Inputs**
+Or, you can hire us for training, consulting, or development. [Set up a free consultation](https://www.bitovi.com/services/devops-consulting).
+
+# Basic Use
+
+> **Note: ** Be sure to [set up your project for actions deployed pages](#set-up-your-project-for-actions-deployed-pages).
+
+For basic usage, create `.github/workflows/deploy.yaml` with the following to build on push.
+```yaml
+on:
+  push:
+    branches:
+      - "main" # change to the branch you wish to deploy from
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - id: build-publish
+      uses: bitovi/github-actions-deploy-rds@v1.0.0
+      with:
+        aws_rds_db_enable: true
+```
+### Inputs
+1. [AWS Specific](#aws-specific)
+1. [Action defaykt inputs](#action-default-inputs)
+1. [RDS Inputs](#rds-inputs)
+1. [DB Proxy Inputs](#db-proxy-inputs)
+1. [VPC Inputs](#vpc-inputs)
+
+The following inputs can be used as `step.with` keys
+<br/>
+<br/>
+#### **AWS Specific**
 | Name             | Type    | Description                        |
 |------------------|---------|------------------------------------|
-| `aws_ecr_repo_create` | Boolean | Determines whether a repository will be created.' |
-| `aws_ecr_repo_type` | String | The type of repository to create. Either `public` or `private`. Defaults to `private`.' |
-| `aws_ecr_repo_name` | String | The name of the repository. If none, will use the default resource-identifier.' |
-| `aws_ecr_repo_mutable` | Boolean | The tag mutability setting for the repository. Set this to true if `MUTABLE`. Defaults to false, so `IMMUTABLE`' |
-| `aws_ecr_repo_encryption_type` | String | The encryption type for the repository. Must be one of: `KMS` or `AES256`. Defaults to `AES256`' |
-| `aws_ecr_repo_encryption_key_arn` | String | The ARN of the KMS key to use when encryption_type is `KMS`. If not specified, uses the default AWS managed key for ECR. |
-| `aws_ecr_repo_force_destroy` | Boolean | If `true`, will delete the repository even if it contains images. Defaults to `false`' |
-| `aws_ecr_repo_image_scan` | Boolean | Indicates whether images are scanned after being pushed to the repository (`true`) (default) or not scanned (`false`)' |
-| `aws_ecr_registry_scan_rule` | String | One or multiple blocks specifying scanning rules to determine which repository filters are used and at what frequency. Defaults to `[]`.  |
-| `aws_ecr_registry_pull_through_cache_rules` | String | List of pull through cache rules to create. Use map(map(string)). ' |
-| `aws_ecr_registry_scan_config` | String | Scanning type to set for the registry. Can be either `ENHANCED` or `BASIC`. Defaults to null.' |
-| `aws_ecr_registry_replication_rules_input` | String | The replication rules for a replication configuration. A maximum of 10 are allowed. Defaults to `[]`.' |
-| `aws_ecr_repo_policy_attach` | Boolean | Determines whether a repository policy will be attached to the repository. Defaults to `true`.' |
-| `aws_ecr_repo_policy_create` | Boolean | Determines whether a repository policy will be created. Defaults to `true`.' |
-| `aws_ecr_repo_policy_input` | String | The JSON policy to apply to the repository. If defined overrides the default policy' |
-| `aws_ecr_repo_read_arn` | String | The ARNs of the IAM users/roles that have read access to the repository. (Comma separated list)' |
-| `aws_ecr_repo_write_arn` | String | The ARNs of the IAM users/roles that have read/write access to the repository. (Comma separated list)' |
-| `aws_ecr_repo_read_arn_lambda` | String | The ARNs of the Lambda service roles that have read access to the repository. (Comma separated list)' |
-| `aws_ecr_lifecycle_policy_input` | String | The policy document. This is a JSON formatted string. See more details about [Policy Parameters](http://docs.aws.amazon.com/AmazonECR/latest/userguide/LifecyclePolicies.html#lifecycle_policy_parameters) in the official AWS docs' |
-| `aws_ecr_public_repo_catalog` | String | Catalog data configuration for the repository. Defaults to `{}`.' |
-| `aws_ecr_registry_policy_input` | String | The policy document. This is a JSON formatted string' |
-| `aws_ecr_additional_tags ` | JSON | Add additional tags to the terraform [default tags](https://www.hashicorp.com/blog/default-tags-in-the-terraform-aws-provider), any tags put here will be added to aurora provisioned resources.|
+| `aws_access_key_id` | String | AWS access key ID |
+| `aws_secret_access_key` | String | AWS secret access key |
+| `aws_session_token` | String | AWS session token |
+| `aws_default_region` | String | AWS default region. Defaults to `us-east-1` |
+| `aws_resource_identifier` | String | Set to override the AWS resource identifier for the deployment. Defaults to `${GITHUB_ORG_NAME}-${GITHUB_REPO_NAME}-${GITHUB_BRANCH_NAME}`. Use with destroy to destroy specific resources. |
+| `aws_additional_tags` | JSON | Add additional tags to the terraform [default tags](https://www.hashicorp.com/blog/default-tags-in-the-terraform-aws-provider), any tags put here will be added to all provisioned resources.|
+<hr/>
+<br/>
+
+#### **Action default inputs**
+| Name             | Type    | Description                        |
+|------------------|---------|------------------------------------|
+| `tf_stack_destroy` | Boolean  | Set to `true` to destroy the stack. |
+| `tf_state_file_name` | String | Change this to be anything you want to. Carefull to be consistent here. A missing file could trigger recreation, or stepping over destruction of non-defined objects. Defaults to `tf-state-aws`. |
+| `tf_state_file_name_append` | String | Appends a string to the tf-state-file. Setting this to `unique` will generate `tf-state-aws-unique`. (Can co-exist with `tf_state_file_name`) |
+| `tf_state_bucket` | String | AWS S3 bucket name to use for Terraform state. See [note](#s3-buckets-naming) | 
+| `tf_state_bucket_destroy` | Boolean | Force purge and deletion of S3 bucket defined. Any file contained there will be destroyed. `tf_stack_destroy` must also be `true`. Default is `false`. |
+| `bitops_code_only` | Boolean | If `true`, will run only the generation phase of BitOps, where the Terraform and Ansible code is built. |
+| `bitops_code_store` | Boolean | Store BitOps generated code as a GitHub artifact. |
+<hr/>
+<br/>
+
+
+#### **RDS Inputs**
+| Name             | Type    | Description                        |
+|------------------|---------|------------------------------------|
+| `aws_rds_db_enable`| Boolean | Set to `true` to enable an RDS DB|
+| `aws_rds_db_proxy`| Boolean | Set to `true` to add a RDS DB Proxy |
+| `aws_rds_db_name`| String | The name of the database to create when the DB instance is created. If this parameter is not specified, no database is created in the DB instance. |
+| `aws_rds_db_user`| String | Username for the db. Defaults to `dbuser`. |
+| `aws_rds_db_engine`| String | Which Database engine to use. Defaults to `postgres`. |
+| `aws_rds_db_engine_version`| String | Which Database engine version to use. |
+| `aws_rds_db_security_group_name`| String | The name of the database security group. Defaults to `SG for ${aws_resource_identifier} - RDS`. |
+| `aws_rds_db_allowed_security_groups` | String | Comma separated list of security groups to add to the DB SG. | 
+| `aws_rds_db_ingress_allow_all` | Boolean | Allow incoming traffic from 0.0.0.0/0. Defaults to `true`. |
+| `aws_rds_db_publicly_accessible` | Boolean | Allow the database to be publicly accessible. Defaults to `false`. |
+| `aws_rds_db_port`| String | Port where the DB listens to. |
+| `aws_rds_db_subnets`| String | Specify which subnets to use as a list of strings.  Example: `i-1234,i-5678,i-9101`. |
+| `aws_rds_db_allocated_storage`| String | Storage size. Defaults to `10`. |
+| `aws_rds_db_max_allocated_storage`| String | Max storage size. Defaults to `0` to disable auto-scaling. |
+| `aws_rds_db_instance_class`| String | DB instance server type. Defaults to `db.t3.micro`. |
+| `aws_rds_db_final_snapshot` | String | If wanted, add a snapshot name. Leave emtpy if not. |
+| `aws_rds_db_restore_snapshot_identifier` | String | Name of the snapshot to create the databse from. |
+| `aws_rds_db_cloudwatch_logs_exports`| String | Set of log types to enable for exporting to CloudWatch logs. Defaults to `postgresql`. MySQL and MariaDB: `audit, error, general, slowquery`. PostgreSQL: `postgresql, upgrade`. MSSQL: `agent , error`. Oracle: `alert, audit, listener, trace`. |
+| `aws_rds_additional_tags` | JSON | Add additional tags to the terraform [default tags](https://www.hashicorp.com/blog/default-tags-in-the-terraform-aws-provider), any tags put here will be added to RDS provisioned resources.|
+<hr/>
+<br/>
+
+
+#### **DB Proxy Inputs**
+| Name             | Type    | Description                        |
+|------------------|---------|------------------------------------|
+| `aws_db_proxy_name` | String | Name of the database proxy.  Defaults to `aws_resource_identifier` |
+| `aws_db_proxy_client_password_auth_type` | String | Overrides auth type. Using `MYSQL_NATIVE_PASSWORD`, `POSTGRES_SCRAM_SHA_256`, and `SQL_SERVER_AUTHENTICATION` depending on the database family. |
+| `aws_db_proxy_tls` | Boolean | Make TLS a requirement for connections. Defaults to `true`.|
+| `aws_db_proxy_security_group_name` | String | Name for the proxy security group. Defaults to `aws_resource_identifier`. |
+| `aws_db_proxy_database_security_group_allow` | Boolean | If true, will add an incoming rule from every security group associated with the DB. |
+| `aws_db_proxy_allowed_security_group` | String | Comma separated list fo allowed security groups to add.|
+| `aws_db_proxy_allow_all_incoming` | Boolean | Allow all incoming traffic to the DB Proxy. Mind that the proxy is only available from the internal network except manually exposed. | 
+| `aws_db_proxy_cloudwatch_enable` | Boolean | Toggle Cloudwatch logs. Will be stored in `/aws/rds/proxy/rds_proxy.name`. |
+| `aws_db_proxy_cloudwatch_retention_days` | String | Number of days to retain cloudwatch logs. Defaults to `14`. |
+| `aws_db_proxy_additional_tags` | JSON | Add additional tags to the ter added to aurora provisioned resources.|
+<hr/>
+<br/>
+
+#### **VPC Inputs**
+| Name             | Type    | Description                        |
+|------------------|---------|------------------------------------|
+| `aws_vpc_create` | Boolean | Define if a VPC should be created |
+| `aws_vpc_name` | String | Define a name for the VPC. Defaults to `VPC for ${aws_resource_identifier}`. |
+| `aws_vpc_cidr_block` | String | Define Base CIDR block which is divided into subnet CIDR blocks. Defaults to `10.0.0.0/16`. |
+| `aws_vpc_public_subnets` | String | Comma separated list of public subnets. Defaults to `10.10.110.0/24`|
+| `aws_vpc_private_subnets` | String | Comma separated list of private subnets. If no input, no private subnet will be created. Defaults to `<none>`. |
+| `aws_vpc_availability_zones` | String | Comma separated list of availability zones. Defaults to `aws_default_region+<random>` value. If a list is defined, the first zone will be the one used for the EC2 instance. |
+| `aws_vpc_id` | String | AWS VPC ID. Accepts `vpc-###` values. |
+| `aws_vpc_subnet_id` | String | AWS VPC Subnet ID. If none provided, will pick one. (Ideal when there's only one) |
+| `aws_vpc_additional_tags` | JSON | Add additional tags to the terraform [default tags](https://www.hashicorp.com/blog/default-tags-in-the-terraform-aws-provider), any tags put here will be added to vpc provisioned resources.|
+<hr/>
+<br/>
+
+# Customizing
+
+## Repository Environments
+To surface published url to the root of the repo via a GitHub Environment, add the following to your workflow:
+```yaml
+# ...etc
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.build-publish.outputs.page_url }}
+    # ...etc
+```
+
+> *Note:* This is helpful when you have a custom domain
+
+<details>
+  <summary>Full example with environment</summary>
+
+  ```yaml
+  on:
+    push:
+      branches:
+        - "main" # change to the branch you wish to deploy from
+
+  permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+  jobs:
+    deploy:
+      environment:
+        name: github-pages
+        url: ${{ steps.build-publish.outputs.page_url }}
+      runs-on: ubuntu-latest
+      steps:
+      - id: build-publish
+        uses: bitovi/github-actions-storybook-to-github-pages@v1.2.0
+        with:
+          path: build # change to your build folder
+  ```
+</details>
+
+## External Blog Posts
+- [How to Deploy Storybook to GitHub Pages with GitHub Actions](https://www.bitovi.com/blog/deploy-storybook-to-github-pages-with-github-actions)
+
+## Contributing
+We would love for you to contribute to [`bitovi/github-actions-storybook-to-github-pages`](hhttps://github.com/bitovi/github-actions-storybook-to-github-pages).   [Issues](https://github.com/bitovi/github-actions-storybook-to-github-pages/issues) and [Pull Requests](https://github.com/bitovi/github-actions-storybook-to-github-pages/pulls) are welcome!
+
+## License
+The scripts and documentation in this project are released under the [MIT License](https://github.com/bitovi/github-actions-storybook-to-github-pages/blob/main/LICENSE).
+
+# Provided by Bitovi
+[Bitovi](https://www.bitovi.com/) is a proud supporter of Open Source software.
+
+# We want to hear from you.
+Come chat with us about open source in our Bitovi community [Discord](https://discord.gg/J7ejFsZnJ4Z)!

@@ -50,13 +50,18 @@ inputs:
     description: 'Force purge and deletion of S3 bucket defined. Any file contained there will be destroyed. `tf_stack_destroy` must also be `true`'
     required: false
   
-
   # AWS RDS
   aws_rds_db_enable:
     description: 'Set to true to enable an RDS DB.'
     required: false
+  aws_rds_db_proxy:
+    description: 'Set to true to add a RDS DB Proxy'
+    required: false
   aws_rds_db_name:
     description: 'The name of the database to create when the DB instance is created.'
+    required: false
+  aws_rds_db_user:
+    description: 'Username for the db. Defaults to dbuser.'
     required: false
   aws_rds_db_engine:
     description: 'Which Database engine to use. Default is postgres'
@@ -66,6 +71,15 @@ inputs:
     required: false
   aws_rds_db_security_group_name:
     description: 'The name of the database security group. Defaults to SG for aws_resource_identifier - RDS.'
+    required: false
+  aws_rds_db_allowed_security_groups:
+    description: 'Comma separated list of security groups to add to the DB SG'
+    required: false
+  aws_rds_db_ingress_allow_all:
+    description: 'Allow incoming traffic from 0.0.0.0/0.'
+    required: false
+  aws_rds_db_publicly_accessible:
+    description: 'Allow the database to be publicly accessible.'
     required: false
   aws_rds_db_port:
     description: ' Port where the DB listens to.'
@@ -82,14 +96,49 @@ inputs:
   aws_rds_db_instance_class:
     description: 'DB instance server type. Defaults to db.t3.micro.'
     required: false
-  aws_rds_db_user:
-    description: 'Username for the db. Defaults to dbuser.'
+  aws_rds_db_final_snapshot:
+    description: 'Generates a snapshot of the database before deletion.'
     required: false
-  aws_rds_cloudwatch_logs_exports:
+  aws_rds_db_restore_snapshot_identifier:
+    description: 'Name of the snapshot to restore the database from.'
+    required: false
+  aws_rds_db_cloudwatch_logs_exports:
     description: 'Set of log types to enable for exporting to CloudWatch logs.'
     required: false
-  aws_rds_additional_tags:
+  aws_rds_db_additional_tags:
     description: 'A JSON object of additional tags that will be included on created resources. Example: `{"key1": "value1", "key2": "value2"}`'
+    required: false
+    
+  # RDS Proxy
+  aws_db_proxy_name:
+    description: 'DB Proxy name'
+    required: false
+  aws_db_proxy_client_password_auth_type:
+    description: 'Auth type to use, will use the following, depending on DB the family. MYSQL_NATIVE_PASSWORD, POSTGRES_SCRAM_SHA_256, and SQL_SERVER_AUTHENTICATION'
+    required: false
+  aws_db_proxy_tls:
+    description: 'Toogle TLS enforcement for connection'
+    required: false
+  aws_db_proxy_security_group_name:
+    description: 'Name for the proxy security group. Default to aws_resource_identifier if none.'
+    required: false
+  aws_db_proxy_database_security_group_allow:
+    description: 'Will add an incoming rule from every security group associated with the DB'
+    required: false
+  aws_db_proxy_allowed_security_group:
+    description: 'Comma separated list of SG Ids to add.'
+    required: false
+  aws_db_proxy_allow_all_incoming:
+    description: 'Allow all incoming traffic to the DB Proxy. Mind that the proxy is only available from the internal network except manually exposed.'
+    required: false
+  aws_db_proxy_cloudwatch_enable:
+    description: 'Toggle Cloudwatch logs. Will be stored in /aws/rds/proxy/rds_proxy.name'
+    required: false
+  aws_db_proxy_cloudwatch_retention_days:
+    description: 'Number of days to retain logs'
+    required: false
+  aws_db_proxy_additional_tags:
+    description: 'A list of strings that will be added to created resources'
     required: false
 
   # AWS VPC Inputs
@@ -128,10 +177,6 @@ runs:
       id: deploy
       uses: bitovi/github-actions-commons@v0.0.6
       with:
-        # Current repo vars
-        bitops_code_only: ${{ inputs.bitops_code_only }}
-        bitops_code_store: ${{ inputs.bitops_code_store }}
-
         # AWS
         aws_access_key_id: ${{ inputs.aws_access_key_id }}
         aws_secret_access_key: ${{ inputs.aws_secret_access_key }}
@@ -139,28 +184,50 @@ runs:
         aws_default_region: ${{ inputs.aws_default_region }}
         aws_resource_identifier: ${{ inputs.aws_resource_identifier }}
         aws_additional_tags: ${{ inputs.aws_additional_tags }}
-
+        
         # Terraform
         tf_stack_destroy: ${{ inputs.tf_stack_destroy }}
         tf_state_file_name: ${{ inputs.tf_state_file_name }}
         tf_state_file_name_append: ${{ inputs.tf_state_file_name_append }}
         tf_state_bucket: ${{ inputs.tf_state_bucket }}
         tf_state_bucket_destroy: ${{ inputs.tf_state_bucket_destroy }}
+        
+        # Current repo vars
+        bitops_code_only: ${{ inputs.bitops_code_only }}
+        bitops_code_store: ${{ inputs.bitops_code_store }}
 
         # AWS RDS
         aws_rds_db_enable: ${{ inputs.aws_rds_db_enable }}
+        aws_rds_db_proxy: ${{ inputs.aws_rds_db_proxy }}
         aws_rds_db_name: ${{ inputs.aws_rds_db_name }}
+        aws_rds_db_user: ${{ inputs.aws_rds_db_user }}
         aws_rds_db_engine: ${{ inputs.aws_rds_db_engine }}
         aws_rds_db_engine_version: ${{ inputs.aws_rds_db_engine_version }}
         aws_rds_db_security_group_name: ${{ inputs.aws_rds_db_security_group_name }}
+        aws_rds_db_allowed_security_groups: ${{ inputs.aws_rds_db_allowed_security_groups }}
+        aws_rds_db_ingress_allow_all: ${{ inputs.aws_rds_db_ingress_allow_all }}
+        aws_rds_db_publicly_accessible: ${{ inputs.aws_rds_db_publicly_accessible }}
         aws_rds_db_port: ${{ inputs.aws_rds_db_port }}
         aws_rds_db_subnets: ${{ inputs.aws_rds_db_subnets }}
         aws_rds_db_allocated_storage: ${{ inputs.aws_rds_db_allocated_storage }}
         aws_rds_db_max_allocated_storage: ${{ inputs.aws_rds_db_max_allocated_storage }}
         aws_rds_db_instance_class: ${{ inputs.aws_rds_db_instance_class }}
-        aws_rds_db_user: ${{ inputs.aws_rds_db_user }}
-        aws_rds_cloudwatch_logs_exports: ${{ inputs.aws_rds_cloudwatch_logs_exports }}
-        aws_rds_additional_tags: ${{ inputs.aws_rds_additional_tags }}
+        aws_rds_db_final_snapshot: ${{ inputs.aws_rds_db_final_snapshot }}
+        aws_rds_db_restore_snapshot_identifier: ${{ inputs.aws_rds_db_restore_snapshot_identifier }}
+        aws_rds_db_cloudwatch_logs_exports: ${{ inputs.aws_rds_db_cloudwatch_logs_exports }}
+        aws_rds_db_additional_tags: ${{ inputs.aws_rds_db_additional_tags }}
+
+        # DB Proxy
+        aws_db_proxy_name : ${{ inputs.aws_db_proxy_name }}
+        aws_db_proxy_client_password_auth_type : ${{ inputs.aws_db_proxy_client_password_auth_type }}
+        aws_db_proxy_tls : ${{ inputs.aws_db_proxy_tls }}
+        aws_db_proxy_security_group_name : ${{ inputs.aws_db_proxy_security_group_name }}
+        aws_db_proxy_database_security_group_allow : ${{ inputs.aws_db_proxy_database_security_group_allow }}
+        aws_db_proxy_allowed_security_group : ${{ inputs.aws_db_proxy_allowed_security_group }}
+        aws_db_proxy_allow_all_incoming : ${{ inputs.aws_db_proxy_allow_all_incoming }}
+        aws_db_proxy_cloudwatch_enable : ${{ inputs.aws_db_proxy_cloudwatch_enable }}
+        aws_db_proxy_cloudwatch_retention_days : ${{ inputs.aws_db_proxy_cloudwatch_retention_days }}
+        aws_db_proxy_additional_tags: ${{ inputs.aws_db_proxy_additional_tags }}
 
         # AWS VPC Inputs
         aws_vpc_create: ${{inputs.aws_vpc_create }}
@@ -172,4 +239,3 @@ runs:
         aws_vpc_id: ${{inputs.aws_vpc_id }}
         aws_vpc_subnet_id: ${{inputs.aws_vpc_subnet_id }}
         aws_vpc_additional_tags: ${{inputs.aws_vpc_additional_tags }}
-
