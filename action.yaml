@@ -50,7 +50,6 @@ inputs:
     description: 'Force purge and deletion of S3 bucket defined. Any file contained there will be destroyed. `tf_stack_destroy` must also be `true`'
     required: false
   
-
   # AWS RDS
   aws_rds_db_enable:
     description: 'Set to true to enable an RDS DB.'
@@ -176,7 +175,7 @@ runs:
   steps:
     - name: Deploy with BitOps
       id: deploy
-      uses: bitovi/github-actions-commons@rds-db-improvements
+      uses: bitovi/github-actions-commons@v0.0.6
       with:
         # AWS
         aws_access_key_id: ${{ inputs.aws_access_key_id }}
@@ -185,12 +184,14 @@ runs:
         aws_default_region: ${{ inputs.aws_default_region }}
         aws_resource_identifier: ${{ inputs.aws_resource_identifier }}
         aws_additional_tags: ${{ inputs.aws_additional_tags }}
+        
         # Terraform
         tf_stack_destroy: ${{ inputs.tf_stack_destroy }}
         tf_state_file_name: ${{ inputs.tf_state_file_name }}
         tf_state_file_name_append: ${{ inputs.tf_state_file_name_append }}
         tf_state_bucket: ${{ inputs.tf_state_bucket }}
         tf_state_bucket_destroy: ${{ inputs.tf_state_bucket_destroy }}
+        
         # Current repo vars
         bitops_code_only: ${{ inputs.bitops_code_only }}
         bitops_code_store: ${{ inputs.bitops_code_store }}
