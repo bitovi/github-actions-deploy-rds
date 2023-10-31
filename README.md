@@ -1,17 +1,21 @@
 # Deploy AWS RDS Database 
 
-`/github-actions-deploy-rds` builds and deploys an AWS RDS Database, with the option for a proxy.
+`bitovi/github-actions-deploy-rds` builds and deploys an AWS RDS Database, with the option for a proxy.
 
 This action uses our new GitHub Actions Commons repository, a library that contains multiple Terraform modules, allowing us to condense all of our tools in one repo, hence continuous improvements are made to it. 
 
-## You are here
-This action creates an RDS Database, with the option to add even a proxy.
+## Action Summary
+This action creates an RDS Database, with the option to add even a proxy. Could be a Postgres, MySQL, MariaDB or MSSQL. 
 
 If you would like to deploy a backend app/service, check out our other actions:
 | Action | Purpose |
 | ------ | ------- |
-| [Deploy Docker to EC2](https://github.com/bitovi/github-actions-deploy-docker-to-ec2) | Deploys a repo with a Dockerized application to a virtual machine (EC2) on AWS |
+| [Deploy Docker to EC2](https://github.com/marketplace/actions/deploy-docker-to-aws-ec2) | Deploys a repo with a Dockerized application to a virtual machine (EC2) on AWS |
+| [Deploy React to GitHub Pages](https://github.com/marketplace/actions/deploy-react-to-github-pages) | Builds and deploys a React application to GitHub Pages. |
 | [Deploy static site to AWS (S3/CDN/R53)](https://github.com/marketplace/actions/deploy-static-site-to-aws-s3-cdn-r53) | Hosts a static site in AWS S3 with CloudFront |
+<br/>
+
+**And more!**, check our [list of actions in the GitHub marketplace](https://github.com/marketplace?category=&type=actions&verification=&query=bitovi)
 
 # Need help or have questions?
 This project is supported by [Bitovi, A DevOps consultancy](https://www.bitovi.com/services/devops-consulting).
@@ -35,8 +39,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - id: build-publish
-      uses: bitovi/github-actions-deploy-rds@v0.1.0
+    - id: deploy-rds
+      uses: bitovi/github-actions-deploy-rds@v0.1.1
       with:
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -44,6 +48,7 @@ jobs:
 
         aws_rds_db_enable: true
 ```
+
 ### Inputs
 1. [AWS Specific](#aws-specific)
 1. [Action defaykt inputs](#action-default-inputs)
@@ -53,7 +58,7 @@ jobs:
 
 The following inputs can be used as `step.with` keys
 <br/>
-<br/>
+
 #### **AWS Specific**
 | Name             | Type    | Description                        |
 |------------------|---------|------------------------------------|
@@ -63,7 +68,6 @@ The following inputs can be used as `step.with` keys
 | `aws_default_region` | String | AWS default region. Defaults to `us-east-1` |
 | `aws_resource_identifier` | String | Set to override the AWS resource identifier for the deployment. Defaults to `${GITHUB_ORG_NAME}-${GITHUB_REPO_NAME}-${GITHUB_BRANCH_NAME}`. Use with destroy to destroy specific resources. |
 | `aws_additional_tags` | JSON | Add additional tags to the terraform [default tags](https://www.hashicorp.com/blog/default-tags-in-the-terraform-aws-provider), any tags put here will be added to all provisioned resources.|
-<hr/>
 <br/>
 
 #### **Action default inputs**
@@ -76,7 +80,6 @@ The following inputs can be used as `step.with` keys
 | `tf_state_bucket_destroy` | Boolean | Force purge and deletion of S3 bucket defined. Any file contained there will be destroyed. `tf_stack_destroy` must also be `true`. Default is `false`. |
 | `bitops_code_only` | Boolean | If `true`, will run only the generation phase of BitOps, where the Terraform and Ansible code is built. |
 | `bitops_code_store` | Boolean | Store BitOps generated code as a GitHub artifact. |
-<hr/>
 <br/>
 
 
@@ -102,7 +105,6 @@ The following inputs can be used as `step.with` keys
 | `aws_rds_db_restore_snapshot_identifier` | String | Name of the snapshot to create the databse from. |
 | `aws_rds_db_cloudwatch_logs_exports`| String | Set of log types to enable for exporting to CloudWatch logs. Defaults to `postgresql`. MySQL and MariaDB: `audit, error, general, slowquery`. PostgreSQL: `postgresql, upgrade`. MSSQL: `agent , error`. Oracle: `alert, audit, listener, trace`. |
 | `aws_rds_additional_tags` | JSON | Add additional tags to the terraform [default tags](https://www.hashicorp.com/blog/default-tags-in-the-terraform-aws-provider), any tags put here will be added to RDS provisioned resources.|
-<hr/>
 <br/>
 
 
@@ -119,7 +121,6 @@ The following inputs can be used as `step.with` keys
 | `aws_db_proxy_cloudwatch_enable` | Boolean | Toggle Cloudwatch logs. Will be stored in `/aws/rds/proxy/rds_proxy.name`. |
 | `aws_db_proxy_cloudwatch_retention_days` | String | Number of days to retain cloudwatch logs. Defaults to `14`. |
 | `aws_db_proxy_additional_tags` | JSON | Add additional tags to the ter added to aurora provisioned resources.|
-<hr/>
 <br/>
 
 #### **VPC Inputs**
@@ -134,7 +135,6 @@ The following inputs can be used as `step.with` keys
 | `aws_vpc_id` | String | AWS VPC ID. Accepts `vpc-###` values. |
 | `aws_vpc_subnet_id` | String | AWS VPC Subnet ID. If none provided, will pick one. (Ideal when there's only one) |
 | `aws_vpc_additional_tags` | JSON | Add additional tags to the terraform [default tags](https://www.hashicorp.com/blog/default-tags-in-the-terraform-aws-provider), any tags put here will be added to vpc provisioned resources.|
-<hr/>
 <br/>
 
 
