@@ -1,5 +1,5 @@
-name: 'Deploy Amazon RDS DB'
-description: 'Deploys an AWS RDS database.'
+name: 'Deploy Amazon RDS DB instance'
+description: 'Deploys an AWS RDS database (Postgres, MySQL, MariaDB or MSSQL)'
 branding:
   icon: upload-cloud
   color: red
@@ -175,7 +175,7 @@ runs:
   steps:
     - name: Deploy with BitOps
       id: deploy
-      uses: bitovi/github-actions-commons@v0.0.6
+      uses: bitovi/github-actions-commons@v0.0.7
       with:
         # AWS
         aws_access_key_id: ${{ inputs.aws_access_key_id }}
