@@ -86,7 +86,6 @@ The following inputs can be used as `step.with` keys
 #### **RDS Inputs**
 | Name             | Type    | Description                        |
 |------------------|---------|------------------------------------|
-| `aws_rds_db_enable`| Boolean | Set to `true` to enable an RDS DB|
 | `aws_rds_db_proxy`| Boolean | Set to `true` to add a RDS DB Proxy |
 | `aws_rds_db_name`| String | The name of the database to create when the DB instance is created. If this parameter is not specified, no database is created in the DB instance. |
 | `aws_rds_db_user`| String | Username for the db. Defaults to `dbuser`. |
