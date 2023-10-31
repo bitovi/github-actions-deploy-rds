@@ -51,6 +51,9 @@ inputs:
     required: false
   
   # AWS RDS
+  aws_rds_db_enable:
+    description: 'Set to true to enable an RDS DB.'
+    required: false
   aws_rds_db_proxy:
     description: 'Set to true to add a RDS DB Proxy'
     required: false
@@ -194,7 +197,7 @@ runs:
         bitops_code_store: ${{ inputs.bitops_code_store }}
 
         # AWS RDS
-        aws_rds_db_enable: true
+        aws_rds_db_enable: ${{ inputs.aws_rds_db_enable }}
         aws_rds_db_proxy: ${{ inputs.aws_rds_db_proxy }}
         aws_rds_db_name: ${{ inputs.aws_rds_db_name }}
         aws_rds_db_user: ${{ inputs.aws_rds_db_user }}
