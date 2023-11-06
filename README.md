@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - id: deploy-rds
-      uses: bitovi/github-actions-deploy-rds@v0.1.1
+      uses: bitovi/github-actions-deploy-rds@v0.1.2
       with:
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -49,9 +49,46 @@ jobs:
         aws_rds_db_enable: true
 ```
 
+# Advanced use
+```yaml
+on:
+  push:
+    branches:
+      - "main" # change to the branch you wish to deploy from
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - id: deploy
+        uses: bitovi/github-actions-deploy-rds@v0.1.2
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_default_region: us-east-1
+
+          aws_additional_tags: '{\"some\":\"extra\",\"tag\":\"added\"}'
+
+          tf_state_bucket_destroy: true
+
+          aws_rds_db_enable: true
+          aws_rds_db_proxy: true
+          aws_rds_db_name: some-db-name
+          aws_rds_db_user: myrdsuser
+          aws_rds_db_ingress_allow_all: true
+          aws_rds_db_subnets: subnet-0000000000000,subnet-0000000000000
+          aws_rds_db_allocated_storage: 10
+          aws_rds_db_max_allocated_storage: 20
+          aws_rds_db_instance_class: db.t3.micro
+          aws_vpc_id: vpc-0000000000000
+          aws_resource_identifier: replaced-this-from
+          tf_state_bucket: bitovi-resources
+          tf_state_file_name_append: rds-dev-db
+```
+
 ### Inputs
 1. [AWS Specific](#aws-specific)
-1. [Action defaykt inputs](#action-default-inputs)
+1. [Action default inputs](#action-default-inputs)
 1. [RDS Inputs](#rds-inputs)
 1. [DB Proxy Inputs](#db-proxy-inputs)
 1. [VPC Inputs](#vpc-inputs)
@@ -88,6 +125,7 @@ The following inputs can be used as `step.with` keys
 |------------------|---------|------------------------------------|
 | `aws_rds_db_enable`| Boolean | Set to `true` to enable an RDS DB|
 | `aws_rds_db_proxy`| Boolean | Set to `true` to add a RDS DB Proxy |
+| `aws_rds_db_identifier`| String | Database identifier that will appear in the AWS Console. Defaults to `aws_resource_identifier` if none set. |
 | `aws_rds_db_name`| String | The name of the database to create when the DB instance is created. If this parameter is not specified, no database is created in the DB instance. |
 | `aws_rds_db_user`| String | Username for the db. Defaults to `dbuser`. |
 | `aws_rds_db_engine`| String | Which Database engine to use. Defaults to `postgres`. |

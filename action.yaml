@@ -57,6 +57,9 @@ inputs:
   aws_rds_db_proxy:
     description: 'Set to true to add a RDS DB Proxy'
     required: false
+  aws_rds_db_identifier:
+    description: 'Database identifier that will appear in the AWS Console. Defaults to aws_resource_identifier if none set.'
+    required: false
   aws_rds_db_name:
     description: 'The name of the database to create when the DB instance is created.'
     required: false
@@ -175,7 +178,7 @@ runs:
   steps:
     - name: Deploy with BitOps
       id: deploy
-      uses: bitovi/github-actions-commons@v0.0.7
+      uses: bitovi/github-actions-commons@v0.0.8
       with:
         # AWS
         aws_access_key_id: ${{ inputs.aws_access_key_id }}
@@ -199,6 +202,7 @@ runs:
         # AWS RDS
         aws_rds_db_enable: ${{ inputs.aws_rds_db_enable }}
         aws_rds_db_proxy: ${{ inputs.aws_rds_db_proxy }}
+        aws_rds_db_identifier: ${{ inputs.aws_rds_db_identifier }}
         aws_rds_db_name: ${{ inputs.aws_rds_db_name }}
         aws_rds_db_user: ${{ inputs.aws_rds_db_user }}
         aws_rds_db_engine: ${{ inputs.aws_rds_db_engine }}
