@@ -88,7 +88,7 @@ jobs:
 
 ### Inputs
 1. [AWS Specific](#aws-specific)
-1. [Action defaykt inputs](#action-default-inputs)
+1. [Action default inputs](#action-default-inputs)
 1. [RDS Inputs](#rds-inputs)
 1. [DB Proxy Inputs](#db-proxy-inputs)
 1. [VPC Inputs](#vpc-inputs)
