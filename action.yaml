@@ -54,6 +54,7 @@ inputs:
   aws_rds_db_enable:
     description: 'Set to true to enable an RDS DB.'
     required: false
+    default: true
   aws_rds_db_proxy:
     description: 'Set to true to add a RDS DB Proxy'
     required: false
@@ -71,6 +72,9 @@ inputs:
     required: false
   aws_rds_db_engine_version:
     description: 'Which Database engine version to use.'
+    required: 
+  aws_rds_db_ca_cert_identifier:
+    description: 'Certificate to use with the database. Defaults to rds-ca-ecc384-g1'
     required: false
   aws_rds_db_security_group_name:
     description: 'The name of the database security group. Defaults to SG for aws_resource_identifier - RDS.'
@@ -178,7 +182,7 @@ runs:
   steps:
     - name: Deploy with BitOps
       id: deploy
-      uses: bitovi/github-actions-commons@v0.0.9
+      uses: bitovi/github-actions-commons@v0.0.10
       with:
         # AWS
         aws_access_key_id: ${{ inputs.aws_access_key_id }}
@@ -207,6 +211,7 @@ runs:
         aws_rds_db_user: ${{ inputs.aws_rds_db_user }}
         aws_rds_db_engine: ${{ inputs.aws_rds_db_engine }}
         aws_rds_db_engine_version: ${{ inputs.aws_rds_db_engine_version }}
+        aws_rds_db_ca_cert_identifier: ${{ inputs.aws_rds_db_ca_cert_identifier }}
         aws_rds_db_security_group_name: ${{ inputs.aws_rds_db_security_group_name }}
         aws_rds_db_allowed_security_groups: ${{ inputs.aws_rds_db_allowed_security_groups }}
         aws_rds_db_ingress_allow_all: ${{ inputs.aws_rds_db_ingress_allow_all }}
