@@ -123,26 +123,27 @@ The following inputs can be used as `step.with` keys
 #### **RDS Inputs**
 | Name             | Type    | Description                        |
 |------------------|---------|------------------------------------|
-| `aws_rds_db_enable`| Boolean | Set to `true` to enable an RDS DB|
-| `aws_rds_db_proxy`| Boolean | Set to `true` to add a RDS DB Proxy |
+| `aws_rds_db_enable`| Boolean | Toggles the creation of a RDS DB. Defaults to `true`. |
+| `aws_rds_db_proxy`| Boolean | Set to `true` to add a RDS DB Proxy. |
 | `aws_rds_db_identifier`| String | Database identifier that will appear in the AWS Console. Defaults to `aws_resource_identifier` if none set. |
 | `aws_rds_db_name`| String | The name of the database to create when the DB instance is created. If this parameter is not specified, no database is created in the DB instance. |
-| `aws_rds_db_user`| String | Username for the db. Defaults to `dbuser`. |
+| `aws_rds_db_user`| String | Username for the database. Defaults to `dbuser`. |
 | `aws_rds_db_engine`| String | Which Database engine to use. Defaults to `postgres`. |
-| `aws_rds_db_engine_version`| String | Which Database engine version to use. |
+| `aws_rds_db_engine_version`| String | Which Database engine version to use. Will use latest if none defined. |
+| `aws_rds_db_ca_cert_identifier`| String | Defines the certificate to use with the instance. Defaults to `rds-ca-ecc384-g1`.|
 | `aws_rds_db_security_group_name`| String | The name of the database security group. Defaults to `SG for ${aws_resource_identifier} - RDS`. |
-| `aws_rds_db_allowed_security_groups` | String | Comma separated list of security groups to add to the DB SG. | 
+| `aws_rds_db_allowed_security_groups` | String | Comma separated list of security groups to add to the DB Security Group. (Allowing incoming traffic.) | 
 | `aws_rds_db_ingress_allow_all` | Boolean | Allow incoming traffic from 0.0.0.0/0. Defaults to `true`. |
-| `aws_rds_db_publicly_accessible` | Boolean | Allow the database to be publicly accessible. Defaults to `false`. |
+| `aws_rds_db_publicly_accessible` | Boolean | Allow the database to be publicly accessible from the internet. Defaults to `false`. |
 | `aws_rds_db_port`| String | Port where the DB listens to. |
 | `aws_rds_db_subnets`| String | Specify which subnets to use as a list of strings.  Example: `i-1234,i-5678,i-9101`. |
 | `aws_rds_db_allocated_storage`| String | Storage size. Defaults to `10`. |
 | `aws_rds_db_max_allocated_storage`| String | Max storage size. Defaults to `0` to disable auto-scaling. |
-| `aws_rds_db_instance_class`| String | DB instance server type. Defaults to `db.t3.micro`. |
-| `aws_rds_db_final_snapshot` | String | If wanted, add a snapshot name. Leave emtpy if not. |
-| `aws_rds_db_restore_snapshot_identifier` | String | Name of the snapshot to create the databse from. |
-| `aws_rds_db_cloudwatch_logs_exports`| String | Set of log types to enable for exporting to CloudWatch logs. Defaults to `postgresql`. MySQL and MariaDB: `audit, error, general, slowquery`. PostgreSQL: `postgresql, upgrade`. MSSQL: `agent , error`. Oracle: `alert, audit, listener, trace`. |
-| `aws_rds_additional_tags` | JSON | Add additional tags to the terraform [default tags](https://www.hashicorp.com/blog/default-tags-in-the-terraform-aws-provider), any tags put here will be added to RDS provisioned resources.|
+| `aws_rds_db_instance_class`| String | DB instance server type. Defaults to `db.t3.micro`. See [this list](https://aws.amazon.com/rds/instance-types/). |
+| `aws_rds_db_final_snapshot` | String | If final snapshot is wanted, add a snapshot name. Leave emtpy if not. |
+| `aws_rds_db_restore_snapshot_identifier` | String | Name of the snapshot to restore the databse from. |
+| `aws_rds_db_cloudwatch_logs_exports`| String | Set of log types to enable for exporting to CloudWatch logs. Defaults to `postgresql`. Options are MySQL and MariaDB: `audit,error,general,slowquery`. PostgreSQL: `postgresql,upgrade`. MSSQL: `agent,error`. Oracle: `alert,audit,listener,trace`. |
+| `aws_rds_db_additional_tags` | JSON | Add additional tags to the terraform [default tags](https://www.hashicorp.com/blog/default-tags-in-the-terraform-aws-provider), any tags put here will be added to RDS provisioned resources.|
 <br/>
 
 
@@ -154,8 +155,8 @@ The following inputs can be used as `step.with` keys
 | `aws_db_proxy_tls` | Boolean | Make TLS a requirement for connections. Defaults to `true`.|
 | `aws_db_proxy_security_group_name` | String | Name for the proxy security group. Defaults to `aws_resource_identifier`. |
 | `aws_db_proxy_database_security_group_allow` | Boolean | If true, will add an incoming rule from every security group associated with the DB. |
-| `aws_db_proxy_allowed_security_group` | String | Comma separated list fo allowed security groups to add.|
-| `aws_db_proxy_allow_all_incoming` | Boolean | Allow all incoming traffic to the DB Proxy. Mind that the proxy is only available from the internal network except manually exposed. | 
+| `aws_db_proxy_allowed_security_group` | String | Comma separated list for extra allowed security groups.|
+| `aws_db_proxy_allow_all_incoming` | Boolean | Allow all incoming traffic to the DB Proxy (0.0.0.0/0 rule). Keep in mind that the proxy is only available from the internal network except manually exposed. | 
 | `aws_db_proxy_cloudwatch_enable` | Boolean | Toggle Cloudwatch logs. Will be stored in `/aws/rds/proxy/rds_proxy.name`. |
 | `aws_db_proxy_cloudwatch_retention_days` | String | Number of days to retain cloudwatch logs. Defaults to `14`. |
 | `aws_db_proxy_additional_tags` | JSON | Add additional tags to the ter added to aurora provisioned resources.|
@@ -164,14 +165,14 @@ The following inputs can be used as `step.with` keys
 #### **VPC Inputs**
 | Name             | Type    | Description                        |
 |------------------|---------|------------------------------------|
-| `aws_vpc_create` | Boolean | Define if a VPC should be created |
+| `aws_vpc_create` | Boolean | Define if a VPC should be created. Defaults to `false`. |
 | `aws_vpc_name` | String | Define a name for the VPC. Defaults to `VPC for ${aws_resource_identifier}`. |
 | `aws_vpc_cidr_block` | String | Define Base CIDR block which is divided into subnet CIDR blocks. Defaults to `10.0.0.0/16`. |
 | `aws_vpc_public_subnets` | String | Comma separated list of public subnets. Defaults to `10.10.110.0/24`|
 | `aws_vpc_private_subnets` | String | Comma separated list of private subnets. If no input, no private subnet will be created. Defaults to `<none>`. |
 | `aws_vpc_availability_zones` | String | Comma separated list of availability zones. Defaults to `aws_default_region+<random>` value. If a list is defined, the first zone will be the one used for the EC2 instance. |
-| `aws_vpc_id` | String | AWS VPC ID. Accepts `vpc-###` values. |
-| `aws_vpc_subnet_id` | String | AWS VPC Subnet ID. If none provided, will pick one. (Ideal when there's only one) |
+| `aws_vpc_id` | String | **Existing** AWS VPC ID to use. Accepts `vpc-###` values. |
+| `aws_vpc_subnet_id` | String | **Existing** AWS VPC Subnet ID. If none provided, will pick one. (Ideal when there's only one). |
 | `aws_vpc_additional_tags` | JSON | Add additional tags to the terraform [default tags](https://www.hashicorp.com/blog/default-tags-in-the-terraform-aws-provider), any tags put here will be added to vpc provisioned resources.|
 <br/>
 
