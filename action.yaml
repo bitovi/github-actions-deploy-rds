@@ -200,7 +200,7 @@ runs:
   steps:
     - name: Deploy with BitOps
       id: deploy
-      uses: bitovi/github-actions-commons@main
+      uses: bitovi/github-actions-commons@v0.0.11
       with:
         # AWS
         aws_access_key_id: ${{ inputs.aws_access_key_id }}
@@ -249,6 +249,7 @@ runs:
         aws_rds_db_maintenance_window: ${{ inputs.aws_rds_db_maintenance_window }}
         aws_rds_db_apply_immediately: ${{ inputs.aws_rds_db_apply_immediately }}
         aws_rds_db_additional_tags: ${{ inputs.aws_rds_db_additional_tags }}
+        
         # DB Proxy
         aws_db_proxy_name : ${{ inputs.aws_db_proxy_name }}
         aws_db_proxy_client_password_auth_type : ${{ inputs.aws_db_proxy_client_password_auth_type }}
