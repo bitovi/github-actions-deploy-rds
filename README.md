@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - id: deploy-rds
-      uses: bitovi/github-actions-deploy-rds@v0.1.3
+      uses: bitovi/github-actions-deploy-rds@v0.1.5
       with:
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: deploy
-        uses: bitovi/github-actions-deploy-rds@v0.1.3
+        uses: bitovi/github-actions-deploy-rds@v0.1.5
         with:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
