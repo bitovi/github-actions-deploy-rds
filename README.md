@@ -3,7 +3,7 @@
 `bitovi/github-actions-deploy-rds` builds and deploys an AWS RDS Database, with the option for a proxy.
 
 This action uses our new GitHub Actions Commons repository, a library that contains multiple Terraform modules, allowing us to condense all of our tools in one repo, hence continuous improvements are made to it. 
-
+![alt](https://bitovi-gha-pixel-tracker-deployment-main.bitovi-sandbox.com/pixel/bGWmpApZe-xqJr6P-CmOJ)
 ## Action Summary
 This action creates an RDS Database, with the option to add even a proxy. Could be a Postgres, MySQL, MariaDB or MSSQL. 
 
