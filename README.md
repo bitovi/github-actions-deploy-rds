@@ -93,6 +93,9 @@ jobs:
 1. [DB Proxy Inputs](#db-proxy-inputs)
 1. [VPC Inputs](#vpc-inputs)
 
+### Outputs
+1. [Action Outputs](#action-outputs)
+
 The following inputs can be used as `step.with` keys
 <br/>
 
@@ -179,9 +182,37 @@ The following inputs can be used as `step.with` keys
 | `aws_vpc_availability_zones` | String | Comma separated list of availability zones. Defaults to `aws_default_region+<random>` value. If a list is defined, the first zone will be the one used for the EC2 instance. |
 | `aws_vpc_id` | String | **Existing** AWS VPC ID to use. Accepts `vpc-###` values. |
 | `aws_vpc_subnet_id` | String | **Existing** AWS VPC Subnet ID. If none provided, will pick one. (Ideal when there's only one). |
+| `aws_vpc_enable_nat_gateway` | Boolean | Adds a NAT gateway for each public subnet. Defaults to `false`. |
+| `aws_vpc_single_nat_gateway` | Boolean | Toggles only one NAT gateway for all of the public subnets. Defaults to `false`. |
+| `aws_vpc_external_nat_ip_ids` | String | **Existing** comma separated list of IP IDs if reusing. (ElasticIPs). |
 | `aws_vpc_additional_tags` | JSON | Add additional tags to the terraform [default tags](https://www.hashicorp.com/blog/default-tags-in-the-terraform-aws-provider), any tags put here will be added to vpc provisioned resources.|
 <br/>
 
+#### **Action Outputs**
+| Name             | Description                        |
+|------------------|------------------------------------|
+| `aws_vpc_id` | The selected VPC ID used. |
+| `db_endpoint`| RDS Endpoint. |
+| `db_secret_details_name`| AWS Secret name containing db credentials. |
+| `db_sg_id`| SG ID for the RDS instance. |
+| `db_proxy_rds_endpoint`| Database proxy endpoint. |
+| `db_proxy_secret_name_rds`| AWS Secret name containing proxy credentials. |
+| `db_proxy_sg_id_rds`| SG ID for the RDS Proxy instance. |
+<hr/>
+<br/>
+
+## Note about resource identifiers
+
+Most resources will contain the tag `${GITHUB_ORG_NAME}-${GITHUB_REPO_NAME}-${GITHUB_BRANCH_NAME}`, some of them, even the resource name after. 
+We limit this to a 60 characters string because some AWS resources have a length limit and short it if needed.
+
+We use the kubernetes style for this. For example, kubernetes -> k(# of characters)s -> k8s. And so you might see some compressions are made.
+
+For some specific resources, we have a 32 characters limit. If the identifier length exceeds this number after compression, we remove the middle part and replace it for a hash made up from the string itself. 
+
+### S3 buckets naming
+
+Buckets names can be made of up to 63 characters. If the length allows us to add -tf-state, we will do so. If not, a simple -tf will be added.
 
 ## Contributing
 We would love for you to contribute to [`bitovi/github-actions-deploy-rds`](hhttps://github.com/bitovi/github-actions-deploy-rds).   [Issues](https://github.com/bitovi/github-actions-deploy-rds/issues) and [Pull Requests](https://github.com/bitovi/github-actions-deploy-rds/pulls) are welcome!
