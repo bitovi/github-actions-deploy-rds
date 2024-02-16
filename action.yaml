@@ -191,16 +191,48 @@ inputs:
   aws_vpc_subnet_id:
     description: 'Specify a Subnet to be used with the instance. If none provided, will pick one.'
     required: false
+  aws_vpc_enable_nat_gateway:
+    description: 'Enables NAT gateway'
+    required: false
+  aws_vpc_single_nat_gateway:
+    description: 'Creates only one NAT gateway'
+    required: false
+  aws_vpc_external_nat_ip_ids:
+    description: 'Comma separated list of IP IDS to reuse in the NAT gateways'
+    required: false
   aws_vpc_additional_tags:
     description: 'A JSON object of additional tags that will be included on created resources. Example: `{"key1": "value1", "key2": "value2"}`'
     required: false
-    
+
+outputs:
+  aws_vpc_id:
+    description: "The selected VPC ID used."
+    value: ${{ steps.deploy.outputs.aws_vpc_id }}
+  db_endpoint:
+    description: "RDS Endpoint"
+    value: ${{ steps.deploy.outputs.db_endpoint }}
+  db_secret_details_name:
+    description: "AWS Secret name containing db credentials"
+    value: ${{ steps.deploy.outputs.db_secret_details_name }}
+  db_sg_id:
+    description: "SG ID for the RDS instance"
+    value: ${{ steps.deploy.outputs.db_sg_id }}
+  db_proxy_rds_endpoint:
+    description: "Database proxy endpoint"
+    value: ${{ steps.deploy.outputs.db_proxy_rds_endpoint }}
+  db_proxy_secret_name_rds:
+    description: "AWS Secret name containing proxy credentials"
+    value: ${{ steps.deploy.outputs.db_proxy_secret_name_rds }}
+  db_proxy_sg_id_rds:
+    description: "SG ID for the RDS Proxy instance"
+    value: ${{ steps.deploy.outputs.db_proxy_sg_id_rds }}
+
 runs:
   using: 'composite'
   steps:
     - name: Deploy with BitOps
       id: deploy
-      uses: bitovi/github-actions-commons@v0.0.11
+      uses: bitovi/github-actions-commons@v0.0.13
       with:
         # AWS
         aws_access_key_id: ${{ inputs.aws_access_key_id }}
@@ -251,15 +283,15 @@ runs:
         aws_rds_db_additional_tags: ${{ inputs.aws_rds_db_additional_tags }}
         
         # DB Proxy
-        aws_db_proxy_name : ${{ inputs.aws_db_proxy_name }}
-        aws_db_proxy_client_password_auth_type : ${{ inputs.aws_db_proxy_client_password_auth_type }}
-        aws_db_proxy_tls : ${{ inputs.aws_db_proxy_tls }}
-        aws_db_proxy_security_group_name : ${{ inputs.aws_db_proxy_security_group_name }}
-        aws_db_proxy_database_security_group_allow : ${{ inputs.aws_db_proxy_database_security_group_allow }}
-        aws_db_proxy_allowed_security_group : ${{ inputs.aws_db_proxy_allowed_security_group }}
-        aws_db_proxy_allow_all_incoming : ${{ inputs.aws_db_proxy_allow_all_incoming }}
-        aws_db_proxy_cloudwatch_enable : ${{ inputs.aws_db_proxy_cloudwatch_enable }}
-        aws_db_proxy_cloudwatch_retention_days : ${{ inputs.aws_db_proxy_cloudwatch_retention_days }}
+        aws_db_proxy_name: ${{ inputs.aws_db_proxy_name }}
+        aws_db_proxy_client_password_auth_type: ${{ inputs.aws_db_proxy_client_password_auth_type }}
+        aws_db_proxy_tls: ${{ inputs.aws_db_proxy_tls }}
+        aws_db_proxy_security_group_name: ${{ inputs.aws_db_proxy_security_group_name }}
+        aws_db_proxy_database_security_group_allow: ${{ inputs.aws_db_proxy_database_security_group_allow }}
+        aws_db_proxy_allowed_security_group: ${{ inputs.aws_db_proxy_allowed_security_group }}
+        aws_db_proxy_allow_all_incoming: ${{ inputs.aws_db_proxy_allow_all_incoming }}
+        aws_db_proxy_cloudwatch_enable: ${{ inputs.aws_db_proxy_cloudwatch_enable }}
+        aws_db_proxy_cloudwatch_retention_days: ${{ inputs.aws_db_proxy_cloudwatch_retention_days }}
         aws_db_proxy_additional_tags: ${{ inputs.aws_db_proxy_additional_tags }}
 
         # AWS VPC Inputs
@@ -271,4 +303,7 @@ runs:
         aws_vpc_availability_zones: ${{inputs.aws_vpc_availability_zones }}
         aws_vpc_id: ${{inputs.aws_vpc_id }}
         aws_vpc_subnet_id: ${{inputs.aws_vpc_subnet_id }}
+        aws_vpc_enable_nat_gateway: ${{ inputs.aws_vpc_enable_nat_gateway }}
+        aws_vpc_single_nat_gateway: ${{ inputs.aws_vpc_single_nat_gateway }}
+        aws_vpc_external_nat_ip_ids: ${{ inputs.aws_vpc_external_nat_ip_ids }}
         aws_vpc_additional_tags: ${{inputs.aws_vpc_additional_tags }}
