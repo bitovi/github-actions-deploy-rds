@@ -38,7 +38,7 @@ inputs:
     description: 'Set to "true" to Destroy the stack through Terraform.'
     required: false
   tf_state_file_name:
-    description: 'Change this to be anything you want to. Carefull to be consistent here. A missing file could trigger recreation, or stepping over destruction of non-defined objects.'
+    description: 'Change this to be anything you want to. Careful to be consistent here. A missing file could trigger recreation, or stepping over destruction of non-defined objects.'
     required: false
   tf_state_file_name_append:
     description: 'Append a string to the tf-state-file. Setting this to `unique` will generate `tf-state-aws-unique`. Can co-exist with the tf_state_file_name variable. '
@@ -89,7 +89,7 @@ inputs:
     description: 'Allow the database to be publicly accessible.'
     required: false
   aws_rds_db_port:
-    description: ' Port where the DB listens to.'
+    description: 'Port where the DB listens to.'
     required: false
   aws_rds_db_subnets:
     description: 'Specify which subnets to use as a list of strings. '
@@ -101,7 +101,7 @@ inputs:
     description: 'Max storage size. Defaults to 0 to disable auto-scaling.'
     required: false
   aws_rds_db_storage_encrypted:
-    description: 'Toogle storage encryption. Defatuls to false.'
+    description: 'Toggle storage encryption. Defaults to false.'
     required: false
   aws_rds_db_storage_type:
     description: 'Storage type. Like gp2 / gp3. Defaults to gp2.'
@@ -130,6 +130,15 @@ inputs:
   aws_rds_db_apply_immediately:
     description: 'Specifies whether any database modifications are applied immediately, or during the next maintenance window'
     required: false
+  aws_rds_db_performance_insights_enable:
+    description: 'Enables performance insights for the database. Defaults to false.'
+    required: false
+  aws_rds_db_performance_insights_retention:
+    description: 'Number of days to retain performance insights data. Defaults to 7.'
+    required: false
+  aws_rds_db_performance_insights_kms_key_id:
+    description: 'KMS key ID to use for encrypting performance insights data.'
+    required: false
   aws_rds_db_additional_tags:
     description: 'A JSON object of additional tags that will be included on created resources. Example: `{"key1": "value1", "key2": "value2"}`'
     required: false
@@ -142,7 +151,7 @@ inputs:
     description: 'Auth type to use, will use the following, depending on DB the family. MYSQL_NATIVE_PASSWORD, POSTGRES_SCRAM_SHA_256, and SQL_SERVER_AUTHENTICATION'
     required: false
   aws_db_proxy_tls:
-    description: 'Toogle TLS enforcement for connection'
+    description: 'Toggle TLS enforcement for connection'
     required: false
   aws_db_proxy_security_group_name:
     description: 'Name for the proxy security group. Default to aws_resource_identifier if none.'
@@ -183,7 +192,7 @@ inputs:
     description: 'Comma separated list of private subnets. If none, none will be created.'
     required: false
   aws_vpc_availability_zones:
-    description: 'Comma separated list of availability zones. Defaults to `aws_default_region.'
+    description: 'Comma separated list of availability zones. Defaults to `aws_default_region`.'
     required: false
   aws_vpc_id:
     description: 'AWS VPC ID. Accepts `vpc-###` values.'
@@ -232,7 +241,7 @@ runs:
   steps:
     - name: Deploy with BitOps
       id: deploy
-      uses: bitovi/github-actions-commons@v1
+      uses: bitovi/github-actions-commons@add-performance-insights-for-dbs
       with:
         # AWS
         aws_access_key_id: ${{ inputs.aws_access_key_id }}
@@ -280,6 +289,9 @@ runs:
         aws_rds_db_multi_az: ${{ inputs.aws_rds_db_multi_az }}
         aws_rds_db_maintenance_window: ${{ inputs.aws_rds_db_maintenance_window }}
         aws_rds_db_apply_immediately: ${{ inputs.aws_rds_db_apply_immediately }}
+        aws_rds_db_performance_insights_enable: ${{ inputs.aws_rds_db_performance_insights_enable }}
+        aws_rds_db_performance_insights_retention: ${{ inputs.aws_rds_db_performance_insights_retention }}
+        aws_rds_db_performance_insights_kms_key_id: ${{ inputs.aws_rds_db_performance_insights_kms_key_id }}
         aws_rds_db_additional_tags: ${{ inputs.aws_rds_db_additional_tags }}
         
         # DB Proxy
@@ -295,15 +307,15 @@ runs:
         aws_db_proxy_additional_tags: ${{ inputs.aws_db_proxy_additional_tags }}
 
         # AWS VPC Inputs
-        aws_vpc_create: ${{inputs.aws_vpc_create }}
-        aws_vpc_name: ${{inputs.aws_vpc_name }}
-        aws_vpc_cidr_block: ${{inputs.aws_vpc_cidr_block }}
-        aws_vpc_public_subnets: ${{inputs.aws_vpc_public_subnets }}
-        aws_vpc_private_subnets: ${{inputs.aws_vpc_private_subnets }}
-        aws_vpc_availability_zones: ${{inputs.aws_vpc_availability_zones }}
-        aws_vpc_id: ${{inputs.aws_vpc_id }}
-        aws_vpc_subnet_id: ${{inputs.aws_vpc_subnet_id }}
+        aws_vpc_create: ${{ inputs.aws_vpc_create }}
+        aws_vpc_name: ${{ inputs.aws_vpc_name }}
+        aws_vpc_cidr_block: ${{ inputs.aws_vpc_cidr_block }}
+        aws_vpc_public_subnets: ${{ inputs.aws_vpc_public_subnets }}
+        aws_vpc_private_subnets: ${{ inputs.aws_vpc_private_subnets }}
+        aws_vpc_availability_zones: ${{ inputs.aws_vpc_availability_zones }}
+        aws_vpc_id: ${{ inputs.aws_vpc_id }}
+        aws_vpc_subnet_id: ${{ inputs.aws_vpc_subnet_id }}
         aws_vpc_enable_nat_gateway: ${{ inputs.aws_vpc_enable_nat_gateway }}
         aws_vpc_single_nat_gateway: ${{ inputs.aws_vpc_single_nat_gateway }}
         aws_vpc_external_nat_ip_ids: ${{ inputs.aws_vpc_external_nat_ip_ids }}
-        aws_vpc_additional_tags: ${{inputs.aws_vpc_additional_tags }}
+        aws_vpc_additional_tags: ${{ inputs.aws_vpc_additional_tags }}
