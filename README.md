@@ -2,7 +2,8 @@
 
 `bitovi/github-actions-deploy-rds` builds and deploys an AWS RDS Database, with the option for a proxy.
 
-This action uses our new GitHub Actions Commons repository, a library that contains multiple Terraform modules, allowing us to condense all of our tools in one repo, hence continuous improvements are made to it. 
+This action uses our n| `aws_rds_db_performance_insights_retention` | String | Number of days to retain performance insights data. Defaults to `7`. |
+| `aws_rds_db_performance_insights_kms_key_id` | String | KMS key ID to use for encrypting performance insights data. | GitHub Actions Commons repository, a library that contains multiple Terraform modules, allowing us to condense all of our tools in one repo, hence continuous improvements are made to it. 
 ![alt](https://bitovi-gha-pixel-tracker-deployment-main.bitovi-sandbox.com/pixel/bGWmpApZe-xqJr6P-CmOJ)
 ## Action Summary
 This action creates an RDS Database, with the option to add even a proxy. Could be a Postgres, MySQL, MariaDB or MSSQL. 
@@ -114,7 +115,7 @@ The following inputs can be used as `step.with` keys
 | Name             | Type    | Description                        |
 |------------------|---------|------------------------------------|
 | `tf_stack_destroy` | Boolean  | Set to `true` to destroy the stack. |
-| `tf_state_file_name` | String | Change this to be anything you want to. Carefull to be consistent here. A missing file could trigger recreation, or stepping over destruction of non-defined objects. Defaults to `tf-state-aws`. |
+| `tf_state_file_name` | String | Change this to be anything you want to. Careful to be consistent here. A missing file could trigger recreation, or stepping over destruction of non-defined objects. Defaults to `tf-state-aws`. |
 | `tf_state_file_name_append` | String | Appends a string to the tf-state-file. Setting this to `unique` will generate `tf-state-aws-unique`. (Can co-exist with `tf_state_file_name`) |
 | `tf_state_bucket` | String | AWS S3 bucket name to use for Terraform state. See [note](#s3-buckets-naming) | 
 | `tf_state_bucket_destroy` | Boolean | Force purge and deletion of S3 bucket defined. Any file contained there will be destroyed. `tf_stack_destroy` must also be `true`. Default is `false`. |
@@ -142,16 +143,25 @@ The following inputs can be used as `step.with` keys
 | `aws_rds_db_subnets`| String | Specify which subnets to use as a list of strings.  Example: `i-1234,i-5678,i-9101`. |
 | `aws_rds_db_allocated_storage`| String | Storage size. Defaults to `10`. |
 | `aws_rds_db_max_allocated_storage`| String | Max storage size. Defaults to `0` to disable auto-scaling. |
-| `aws_rds_db_storage_encrypted` | Boolean | Toogle storage encryption. Defatuls to false. |
+| `aws_rds_db_storage_encrypted` | Boolean | Toggle storage encryption. Defaults to false. |
 | `aws_rds_db_storage_type` | String | Storage type. Like gp2 / gp3. Defaults to gp2. |
 | `aws_rds_db_kms_key_id` | String | The ARN for the KMS encryption key. |
 | `aws_rds_db_instance_class`| String | DB instance server type. Defaults to `db.t3.micro`. See [this list](https://aws.amazon.com/rds/instance-types/). |
-| `aws_rds_db_final_snapshot` | String | If final snapshot is wanted, add a snapshot name. Leave emtpy if not. |
-| `aws_rds_db_restore_snapshot_identifier` | String | Name of the snapshot to restore the databse from. |
+| `aws_rds_db_final_snapshot` | String | If final snapshot is wanted, add a snapshot name. Leave empty if not. |
+| `aws_rds_db_restore_snapshot_identifier` | String | Name of the snapshot to restore the database from. |
 | `aws_rds_db_cloudwatch_logs_exports`| String | Set of log types to enable for exporting to CloudWatch logs. Defaults to `postgresql`. Options are MySQL and MariaDB: `audit,error,general,slowquery`. PostgreSQL: `postgresql,upgrade`. MSSQL: `agent,error`. Oracle: `alert,audit,listener,trace`. |
 | `aws_rds_db_multi_az` | Boolean| Specifies if the RDS instance is multi-AZ. Defaults to `false`. |
 | `aws_rds_db_maintenance_window` | String | The window to perform maintenance in. Eg: `Mon:00:00-Mon:03:00` |
 | `aws_rds_db_apply_immediately` | Boolean | Specifies whether any database modifications are applied immediately, or during the next maintenance window. Defaults to `false`.|
+| `aws_rds_db_performance_insights_enable` | Boolean | Enables performance insights for the database. Defaults to `false`. |
+| `aws_rds_db_performance_insights_retention` | String | KMS key ID to use for encrypting performance insights data. |
+| `aws_rds_db_performance_insights_kms_key_id` | String | Number of days to retain performance insights data. Defaults to `7`. |
+| `aws_rds_db_insights_mode` | String | The mode for Performance Insights. Could be `standard` (default) or `advanced`. |
+| `aws_rds_db_allow_major_version_upgrade` | Boolean | Indicates that major version upgrades are allowed. Defaults to `false`. |
+| `aws_rds_db_auto_minor_version_upgrade` | Boolean | Indicates that minor version upgrades are allowed. Defaults to `true`. |
+| `aws_rds_db_backup_retention_period` | String | The number of days to retain backups for. Must be between 0 (disabled) and 35. Defaults to `0`. |
+| `aws_rds_db_backup_window` | String | The window during which backups are taken. Eg: `"09:46-10:16"`. |
+| `aws_rds_db_copy_tags_to_snapshot` | Boolean | Indicates whether to copy tags to snapshots. Defaults to `false`. |
 | `aws_rds_db_additional_tags` | JSON | Add additional tags to the terraform [default tags](https://www.hashicorp.com/blog/default-tags-in-the-terraform-aws-provider), any tags put here will be added to RDS provisioned resources.|
 <br/>
 
@@ -168,7 +178,7 @@ The following inputs can be used as `step.with` keys
 | `aws_db_proxy_allow_all_incoming` | Boolean | Allow all incoming traffic to the DB Proxy (0.0.0.0/0 rule). Keep in mind that the proxy is only available from the internal network except manually exposed. | 
 | `aws_db_proxy_cloudwatch_enable` | Boolean | Toggle Cloudwatch logs. Will be stored in `/aws/rds/proxy/rds_proxy.name`. |
 | `aws_db_proxy_cloudwatch_retention_days` | String | Number of days to retain cloudwatch logs. Defaults to `14`. |
-| `aws_db_proxy_additional_tags` | JSON | Add additional tags to the ter added to aurora provisioned resources.|
+| `aws_db_proxy_additional_tags` | JSON | Add additional tags to the terraform [default tags](https://www.hashicorp.com/blog/default-tags-in-the-terraform-aws-provider), any tags put here will be added to created resources. |
 <br/>
 
 #### **VPC Inputs**
@@ -215,7 +225,7 @@ For some specific resources, we have a 32 characters limit. If the identifier le
 Buckets names can be made of up to 63 characters. If the length allows us to add -tf-state, we will do so. If not, a simple -tf will be added.
 
 ## Contributing
-We would love for you to contribute to [`bitovi/github-actions-deploy-rds`](hhttps://github.com/bitovi/github-actions-deploy-rds).   [Issues](https://github.com/bitovi/github-actions-deploy-rds/issues) and [Pull Requests](https://github.com/bitovi/github-actions-deploy-rds/pulls) are welcome!
+We would love for you to contribute to [`bitovi/github-actions-deploy-rds`](https://github.com/bitovi/github-actions-deploy-rds).   [Issues](https://github.com/bitovi/github-actions-deploy-rds/issues) and [Pull Requests](https://github.com/bitovi/github-actions-deploy-rds/pulls) are welcome!
 
 ## License
 The scripts and documentation in this project are released under the [MIT License](https://github.com/bitovi/github-actions-deploy-rds/blob/main/LICENSE).
