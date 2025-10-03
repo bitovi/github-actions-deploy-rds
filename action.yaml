@@ -265,7 +265,7 @@ runs:
   steps:
     - name: Deploy with BitOps
       id: deploy
-      uses: bitovi/github-actions-commons@add-performance-insights-for-dbs
+      uses: bitovi/github-actions-commons@v2
       with:
         # AWS
         aws_access_key_id: ${{ inputs.aws_access_key_id }}
