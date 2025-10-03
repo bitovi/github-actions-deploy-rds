@@ -139,6 +139,12 @@ inputs:
   aws_rds_db_performance_insights_kms_key_id:
     description: 'KMS key ID to use for encrypting performance insights data.'
     required: false
+  aws_rds_db_monitoring_interval:
+    description: 'The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance. To disable, set to 0.'
+    required: false
+  aws_rds_db_monitoring_role_arn:
+    description: 'The ARN for the IAM role that permits RDS to send enhanced monitoring metrics to CloudWatch Logs.'
+    required: false
   aws_rds_db_insights_mode:
     description: 'The mode for Performance Insights.'
     required: false
@@ -259,7 +265,7 @@ runs:
   steps:
     - name: Deploy with BitOps
       id: deploy
-      uses: bitovi/github-actions-commons@v2
+      uses: bitovi/github-actions-commons@add-performance-insights-for-dbs
       with:
         # AWS
         aws_access_key_id: ${{ inputs.aws_access_key_id }}
@@ -310,6 +316,8 @@ runs:
         aws_rds_db_performance_insights_enable: ${{ inputs.aws_rds_db_performance_insights_enable }}
         aws_rds_db_performance_insights_retention: ${{ inputs.aws_rds_db_performance_insights_retention }}
         aws_rds_db_performance_insights_kms_key_id: ${{ inputs.aws_rds_db_performance_insights_kms_key_id }}
+        aws_rds_db_monitoring_interval: ${{ inputs.aws_rds_db_monitoring_interval }}
+        aws_rds_db_monitoring_role_arn: ${{ inputs.aws_rds_db_monitoring_role_arn }}
         aws_rds_db_insights_mode: ${{ inputs.aws_rds_db_insights_mode }}
         aws_rds_db_allow_major_version_upgrade: ${{ inputs.aws_rds_db_allow_major_version_upgrade }}
         aws_rds_db_auto_minor_version_upgrade: ${{ inputs.aws_rds_db_auto_minor_version_upgrade }}
